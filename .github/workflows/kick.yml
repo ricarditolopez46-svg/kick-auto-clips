@@ -22,11 +22,11 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y ffmpeg
 
-      - name: Crear MP4 de 30 minutos
+      - name: Crear MP4 de 1 hora
         env:
           VIDEO_URL: ${{ inputs.video_url }}
         run: |
-          ffmpeg -y -i "$VIDEO_URL" -t 1800 \
+          ffmpeg -y -i "$VIDEO_URL" -t 3600 \
            -map 0:v:0 -map 0:a:0 \
            -c:v libx264 -preset veryfast -crf 28 \
            -vf "scale=-2:720" \
