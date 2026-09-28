@@ -1,5 +1,4 @@
-
-name: Probar video de Kick
+name: Probar MP4 de Kick
 
 on:
   workflow_dispatch:
@@ -10,7 +9,7 @@ on:
         type: string
 
 jobs:
-  comprobar-video:
+  crear-mp4:
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -20,11 +19,25 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y ffmpeg
 
-      - name: Comprobar video
+      - name: Crear MP4 de 60 segundos
         env:
           VIDEO_URL: ${{ inputs.video_url }}
         run: |
+          ffmpeg -y -i "$VIDEO_URL" -t 60 \
+            -map 0:v:0 -map 0:a:0 \
+            -c:v copy -c:a copy \
+            -movflags +faststart prueba.mp4
+
+      - name: Comprobar MP4
+        run: |
           ffprobe -v error \
-            -show_entries format=duration \
+            -show_entries format=duration,size \
             -show_entries stream=codec_name,codec_type \
-            -of json "$VIDEO_URL"
+            -of json prueba.mp4
+
+      - name: Guardar MP4 de prueba
+        uses: actions/upload-artifact@v4
+        with:
+          name: video-kick-prueba
+          path: prueba.mp4
+          retention-days: 1
