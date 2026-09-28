@@ -1,0 +1,30 @@
+
+name: Probar video de Kick
+
+on:
+  workflow_dispatch:
+    inputs:
+      video_url:
+        description: "Enlace source del video de Kick"
+        required: true
+        type: string
+
+jobs:
+  comprobar-video:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Instalar FFmpeg
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+
+      - name: Comprobar video
+        env:
+          VIDEO_URL: ${{ inputs.video_url }}
+        run: |
+          ffprobe -v error \
+            -show_entries format=duration \
+            -show_entries stream=codec_name,codec_type \
+            -of json "$VIDEO_URL"
