@@ -28,7 +28,7 @@ jobs:
         run: |
           ffmpeg -y -i "$VIDEO_URL" -t 1800 \
            -map 0:v:0 -map 0:a:0 \
-           -c:v libx264 -preset ultrafast -crf 30 \
+           -c:v libx264 -preset veryfast -crf 28 \
            -vf "scale=-2:720" \
            -c:a aac -b:a 96k \
            -movflags +faststart prueba.mp4
