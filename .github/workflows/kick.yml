@@ -30,35 +30,36 @@ jobs:
             -of default=noprint_wrappers=1:nokey=1 \
             "$VIDEO_URL"
 
-      - name: Crear MP4 de 1 hora
+      - name: Crear partes del VOD
         env:
           VIDEO_URL: ${{ inputs.video_url }}
         run: |
-          ffmpeg -y -i "$VIDEO_URL" -t 3600 \
-           -map 0:v:0 -map 0:a:0 \
-           -c:v libx264 -preset veryfast -crf 28 \
-           -vf "scale=-2:720" \
-           -c:a aac -b:a 96k \
-           -movflags +faststart prueba.mp4
+          ffmpeg -y -i "$VIDEO_URL" \
+         -map 0:v:0 -map 0:a:0 \
+         -c:v libx264 -preset veryfast -crf 28 \
+         -vf "scale=-2:720" \
+         -c:a aac -b:a 96k \
+         -f segment -segment_time 3600 -reset_timestamps 1 \
+         parte_%02d.mp4
 
       - name: Comprobar MP4
         run: |
           ffprobe -v error \
             -show_entries format=duration,size \
             -show_entries stream=codec_name,codec_type \
-            -of json prueba.mp4
+            -of json parte_00.mp4
 
       - name: Guardar MP4 de prueba
         uses: actions/upload-artifact@v4
         with:
           name: video-kick-prueba
-          path: prueba.mp4
+          path: parte_*.mp4
           retention-days: 1
 
       - name: Actualizar MP4 del Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release upload video-opusclip prueba.mp4 --clobber --repo ricarditolopez46-svg/kick-auto-clips    
+         gh release upload video-opusclip parte_*.mp4 --clobber --repo ricarditolopez46-svg/kick-auto-clips   
 
     
