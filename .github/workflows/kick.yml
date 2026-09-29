@@ -48,17 +48,11 @@ jobs:
             -show_entries stream=codec_name,codec_type \
             -of json parte_00.mp4
 
-      - name: Guardar MP4 de prueba
-        uses: actions/upload-artifact@v4
-        with:
-          name: video-kick-prueba
-          path: parte_*.mp4
-          retention-days: 1
-
       - name: Actualizar MP4 del Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+         gh release view video-opusclip --json assets --jq '.assets[].name' --repo ricarditolopez46-svg/kick-auto-clips | grep '^parte_.*\.mp4$' | xargs -r -I {} gh release delete-asset video-opusclip "{}" -y --repo ricarditolopez46-svg/kick-auto-clips
          gh release upload video-opusclip parte_*.mp4 --clobber --repo ricarditolopez46-svg/kick-auto-clips   
 
     
