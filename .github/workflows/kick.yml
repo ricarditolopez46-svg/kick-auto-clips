@@ -11,6 +11,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: kick-auto-clips
+  cancel-in-progress: false
+
 jobs:
   crear-mp4:
     runs-on: ubuntu-latest
